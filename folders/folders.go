@@ -43,13 +43,21 @@ func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
 }
 
 func FetchAllFoldersByOrgID(orgID uuid.UUID) ([]*Folder, error) {
+	//Fetches Sample folder data
 	folders := GetSampleData()
 
+	//Initialise empty slice to store folder pointers
 	resFolder := []*Folder{}
+
+	//Iterate through fetched folders
 	for _, folder := range folders {
+		//Find folders with matching OrgID
 		if folder.OrgId == orgID {
+			//Append matching OrgID folders to results slice
 			resFolder = append(resFolder, folder)
 		}
 	}
+
+	//Return folder results slice, and nil error
 	return resFolder, nil
 }
