@@ -52,4 +52,17 @@ func Test_GetAllFolders(t *testing.T) {
 		//Assert that the response is empty
 		assert.Empty(t, response)
 	})
+
+	t.Run("Test with no Request", func(t *testing.T) {
+		var nilReq *folders.FetchFolderRequest
+
+		//Call the GetAllFolders function with nil request
+		response, err := folders.GetAllFolders(nilReq)
+
+		//Assert that an Error has been returned
+		assert.Error(t, err)
+		//Assert that the response is empty
+		assert.Empty(t, response)
+
+	})
 }

@@ -12,6 +12,11 @@ func GetAllFolders(req *FetchFolderRequest) (*FetchFolderResponse, error) {
 		err error
 	)
 
+	//Catch Empty Request
+	if req == nil {
+		return nil, errors.New("Empty Requests are not allowed.")
+	}
+
 	//Call function, assigning result and errors returned
 	r, err := FetchAllFoldersByOrgID(req.OrgID)
 
