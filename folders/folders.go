@@ -1,6 +1,8 @@
 package folders
 
 import (
+	"errors"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -27,6 +29,11 @@ func FetchAllFoldersByOrgID(orgID uuid.UUID) ([]*Folder, error) {
 
 	//Initialise empty slice to store folder pointers
 	resFolder := []*Folder{}
+
+	//Check for empty orgID
+	if orgID.IsNil() {
+		return nil, errors.New("Empty orgID in folder request not allowed.")
+	}
 
 	//Iterate through fetched folders
 	for _, folder := range folders {
