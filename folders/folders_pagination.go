@@ -6,50 +6,69 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// Copy over the `GetFolders` and `FetchAllFoldersByOrgID` to get started
-func GetAllFoldersPag(req *FetchFolderRequest) (*FetchFolderResponse, error) {
-	//Initialise Local Variables
-	var (
-		err error
-	)
-
-	//Catch Empty Request
-	if req == nil {
-		return nil, errors.New("Empty Requests are not allowed.")
-	}
-
-	//Call function, assigning result and errors returned
-	r, err := FetchAllFoldersByOrgID(req.OrgID)
-
-	//Populate fetch folder response pointer initialised with 'Folder' field to r results slice
-	var folder_fetch_response *FetchFolderResponse
-	folder_fetch_response = &FetchFolderResponse{Folders: r}
-
-	//Return fetch folder response pointer, and nil error
-	return folder_fetch_response, err
+// Pagination Types
+type FetchFolderPaginationRequest struct {
+	OrgID    uuid.UUID
+	Token    string
+	PageSize int
 }
 
-func FetchAllFoldersByOrgIDPag(orgID uuid.UUID) ([]*Folder, error) {
-	//Fetches Sample folder data
-	folders := GetSampleData()
+type FetchFolderPaginationResponse struct {
+	Folders []*Folder
+	Token   string
+}
 
-	//Initialise empty slice to store folder pointers
-	resFolder := []*Folder{}
+// Pagination Functions
+func RequestFoldersPaginated(req *FetchFolderPaginationRequest) (*FetchFolderPaginationResponse, error) {
+	//Initialise Local Variables
+	var (
+		err                              error
+		StartPos                         int
+		EndPos                           int
+		Folders                          []*Folder
+		Token                            string
+		TokenFound                       bool
+		NewToken                         string
+		PagedFolders                     []*Folder
+		pagination_folder_fetch_response *FetchFolderPaginationResponse
+	)
 
-	//Check for empty orgID
-	if orgID.IsNil() {
-		return nil, errors.New("Empty orgID in folder request not allowed.")
-	}
+	//Populate Local Variables
+	Folders, err = FetchAllFoldersByOrgID(req.OrgID)
+	StartPos = 0
 
-	//Iterate through fetched folders
-	for _, folder := range folders {
-		//Find folders with matching OrgID
-		if folder.OrgId == orgID {
-			//Append matching OrgID folders to results slice
-			resFolder = append(resFolder, folder)
+	//Determine Start Position from Supplied Token
+	TokenFound = false
+	if req.Token != "" {
+		for i := 0; i <= len(Folders); i++ {
+			if Folders[i].Id.String() == Token {
+				StartPos = i + 1
+				TokenFound = true
+				break
+			}
+		}
+		//Invalid Token
+		if !TokenFound {
+			return nil, errors.New("Invalid Token Supplied.")
 		}
 	}
 
-	//Return folder results slice, and nil error
-	return resFolder, nil
+	//Determine End Position from Page Size
+	EndPos = StartPos + req.PageSize
+
+	//Generate Token
+	NewToken = Folders[EndPos].Id.String()
+
+	//Create Paged Folders
+	PagedFolders = Folders[StartPos:EndPos]
+
+	//Create and Populate Response Structure
+	pagination_folder_fetch_response = &FetchFolderPaginationResponse{
+		Folders: PagedFolders,
+		Token:   NewToken,
+	}
+
+	//Return Response
+	return pagination_folder_fetch_response, err
+
 }
