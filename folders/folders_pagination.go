@@ -86,5 +86,17 @@ func RequestFoldersPaginated(req *FetchFolderPaginationRequest) (*FetchFolderPag
 
 	//Return Response
 	return pagination_folder_fetch_response, err
-
 }
+
+/*
+Pagination Implementation Explanation:
+
+I chose to implement pagination by calling the existing 'FetchAllFoldersByOrgID' as this function has already been built and tested.
+I implemented new request and response types to enable the token to become part of the folder request.
+
+I chose to make the token the id of the last folder of the request, as this is a unique string that is unlikely to be known by an unauthorised source.
+This allows the function to locate the folder with the matching id (token), and start the request from the next folder.
+
+I also chose to make 'PageSize' part of the request, to allow multiple different numbers of folders to be returned.
+
+*/
