@@ -68,7 +68,7 @@ func Test_GetAllFolders(t *testing.T) {
 }
 
 func Test_RequestFoldersPaginated(t *testing.T) {
-	t.Run("Test 1st Folder, no Token", func(t *testing.T) {
+	t.Run("Test 1st Folder, empty Token", func(t *testing.T) {
 		//Create Request
 		req := &folders.FetchFolderPaginationRequest{
 			OrgID:    uuid.FromStringOrNil("c1556e17-b7c0-45a3-a6ae-9546248fb17a"),
@@ -140,5 +140,26 @@ func Test_RequestFoldersPaginated(t *testing.T) {
 
 		//Assert No Folders Returned
 		assert.Empty(t, response)
+	})
+
+	t.Run("Token points to last folder", func(t *testing.T) {
+		//Create Request
+		req := &folders.FetchFolderPaginationRequest{
+			OrgID:    uuid.FromStringOrNil("c1556e17-b7c0-45a3-a6ae-9546248fb17a"),
+			Token:    "28c2f7ea-f1f3-4235-aa28-04dc94a59a67",
+			PageSize: 1,
+		}
+
+		//Call RequestFoldersPaginated function
+		response, err := folders.RequestFoldersPaginated(req)
+
+		//Assert No Error Returned
+		assert.NoError(t, err)
+
+		//Assert No Folders Returned
+		assert.Empty(t, response.Folders)
+
+		//Assert Empty Token Returned
+		assert.Empty(t, response.Token)
 	})
 }
